@@ -13,6 +13,8 @@ interface FoodItem {
   contact: string;
   email: string;
   donorName?: string;
+  status?: 'available' | 'waiting' | 'received';
+  acceptedBy?: string;
 }
 
 interface FoodCardProps {
@@ -39,16 +41,16 @@ const FoodCard = ({ food, userType, onAccept }: FoodCardProps) => {
         return;
       }
 
-      const response = await fetch('/api/accept-food', {
+      const response = await fetch('http://localhost:8080/accept-food', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           foodId: food.id,
-          accepterName: user.name,
-          accepterEmail: user.email,
-          accepterType: user.userType,
+          donorEmail: food.email,
+          userName: user.name,
+          userEmail: user.email,
         }),
       });
 
@@ -65,6 +67,37 @@ const FoodCard = ({ food, userType, onAccept }: FoodCardProps) => {
     } catch (error) {
       toast({
         title: "Error accepting food",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReceived = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/confirm-received', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          foodId: food.id,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Thank you!",
+          description: "Food marked as received and removed from available list.",
+          variant: "default",
+        });
+        onAccept?.(food.id);
+      } else {
+        throw new Error('Failed to confirm receipt');
+      }
+    } catch (error) {
+      toast({
+        title: "Error confirming receipt",
         description: "Please try again later.",
         variant: "destructive",
       });
@@ -116,15 +149,33 @@ const FoodCard = ({ food, userType, onAccept }: FoodCardProps) => {
       </CardContent>
       
       {userType && userType !== 'donor' && (
-        <CardFooter>
-          <Button 
-            onClick={handleAccept} 
-            variant="success" 
-            className="w-full"
-            size="sm"
-          >
-            Accept Food Donation
-          </Button>
+        <CardFooter className="space-y-2">
+          {food.status === 'waiting' ? (
+            <div className="w-full space-y-2">
+              <Badge variant="outline" className="w-full justify-center py-2">
+                ⏳ Waiting for pickup by {food.acceptedBy}
+              </Badge>
+              {food.acceptedBy === JSON.parse(localStorage.getItem('user') || '{}').name && (
+                <Button 
+                  onClick={handleReceived} 
+                  variant="success" 
+                  className="w-full"
+                  size="sm"
+                >
+                  ✅ Mark as Received
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Button 
+              onClick={handleAccept} 
+              variant="success" 
+              className="w-full"
+              size="sm"
+            >
+              Accept Food Donation
+            </Button>
+          )}
         </CardFooter>
       )}
     </Card>

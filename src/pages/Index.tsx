@@ -33,11 +33,23 @@ const Index = () => {
 
   const fetchAvailableFoods = async () => {
     try {
-      const response = await fetch('/api/available-foods');
+      const response = await fetch('http://localhost:8080/available-foods');
       const data = await response.json();
       
       if (response.ok) {
-        setFoods(data.foods || []);
+        // Map the backend response to match our interface
+        const formattedFoods = data.map((food: any) => ({
+          id: food._id,
+          item: food.foodItem,
+          availability: `${food.availability} kg`,
+          expectedPeople: food.expectedPeople,
+          location: food.location,
+          contact: food.contact,
+          email: food.emailVal,
+          status: food.accepted ? 'waiting' : 'available',
+          acceptedBy: food.acceptedBy
+        }));
+        setFoods(formattedFoods);
       } else {
         console.error('Failed to fetch foods');
       }

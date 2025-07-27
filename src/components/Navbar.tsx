@@ -48,9 +48,13 @@ const Navbar = () => {
                   {user.userType}
                 </span>
               </div>
-              {user.userType === 'donor' && (
+              {user.userType === 'donor' ? (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/donor-dashboard">Donor Dashboard</Link>
+                </Button>
+              ) : (
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/user-dashboard">My Dashboard</Link>
                 </Button>
               )}
               <Button onClick={handleLogout} variant="ghost" size="sm">

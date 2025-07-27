@@ -53,15 +53,18 @@ const DonorDashboard = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/add-data', {
+      const response = await fetch('http://localhost:8080/add-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
+          foodItem: formData.item,
+          availability: formData.availability,
           expectedPeople: Number(formData.expectedPeople),
-          donorName: user?.name,
+          location: formData.location,
+          contact: formData.contact,
+          emailVal: formData.email,
         }),
       });
 

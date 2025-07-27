@@ -38,12 +38,17 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('http://localhost:8080/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          userName: formData.name,
+          email: formData.email,
+          userLocation: formData.location,
+          userTypes: formData.userType,
+        }),
       });
 
       const data = await response.json();

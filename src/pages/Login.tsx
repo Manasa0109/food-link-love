@@ -29,12 +29,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('http://localhost:8080/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, name }),
+        body: JSON.stringify({ email, userName: name }),
       });
 
       const data = await response.json();
